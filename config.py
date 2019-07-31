@@ -7,6 +7,7 @@ class Config:
    MOVIE_API_BASE_URL ='https://api.themoviedb.org/3/movie/{}?api_key={}'
    MOVIE_API_KEY = os.environ.get('ca01d53b89a120406e5cc40fb64905e3')
    SECRET_KEY = os.environ.get('sly14')
+   SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://sylviah:sly14@localhost/watchlist'
 
 
    
