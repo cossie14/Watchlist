@@ -1,11 +1,12 @@
 from flask import render_template,request,redirect,url_for,abort
 from . import main
-from ..requests import get_movies,get_movie,search_movie
+from ..request import get_movies,get_movie,search_movie
 from .forms import ReviewForm,UpdateProfile
 from ..models import Review,User,PhotoProfile
-from flask_login import login_required
+from flask_login import login_required,current_user
 from .. import db,photos
 
+import markdown2
 
 
 # Views
@@ -57,6 +58,24 @@ def search(movie_name):
     return render_template('search.html',movies = searched_movies)
 
 
+@main.route('/reviews/<int:id>')
+def movie_reviews(id):
+    movie = get_movie(id)
+
+    reviews = Review.get_reviews(id)
+    title = f'All reviews for {movie.title}'
+    return render_template('movie_reviews.html',title = title,reviews=reviews)
+
+
+@main.route('/review/<int:id>')
+def single_review(id):
+    review=Review.query.get(id)
+    format_review = markdown2.markdown(review.movie_review,extras=["code-friendly", "fenced-code-blocks"])
+    return render_template('review.html',review = review,format_review=format_review)
+
+
+
+
 @main.route('/movie/review/new/<int:id>', methods = ['GET','POST'])
 @login_required
 def new_review(id):
@@ -69,7 +88,8 @@ def new_review(id):
         title = form.title.data
         review = form.review.data
 
-        new_review = Review(movie.id,title,movie.poster,review)
+        new_review = Review(movie_id=movie.id,movie_title=title,image_path=movie.poster,movie_review=review,user=current_user)
+
         new_review.save_review()
 
         return redirect(url_for('.movie',id = movie.id ))
@@ -78,7 +98,7 @@ def new_review(id):
     return render_template('new_review.html',title = title, review_form=form, movie=movie)
 
 @main.route('/user/<uname>')
-@login_required
+
 def profile(uname):
     user = User.query.filter_by(username = uname).first()
 
@@ -116,6 +136,6 @@ def update_pic(uname):
     if 'photo' in request.files:
         filename = photos.save(request.files['photo'])
         path = f'photos/{filename}'
-        user.profile_pic_path = path
-        user_photo = PhotoProfile(pic_path = path,user = user)
+        user.profile_pic_path = path        
         db.session.commit()
+    return redirect(url_for('main.profile',uname=uname))

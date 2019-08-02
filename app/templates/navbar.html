@@ -24,11 +24,18 @@
 
                 <ul class="nav navbar-nav navbar-right">
                   {% if current_user.is_authenticated %}
+                
+<li><a href="{{url_for('main.profile',uname=current_user.username)}}">Profile</a></li>
+                  <li> <img src="{{url_for('static',filename=current_user.profile_pic_path)}}" alt="" class="img-thumbnail" height="70px"width="70px">
+                  </li>
                   <li><a href="{{url_for('auth.logout')}}">Sign out</a></li>
                   {% else %}
                   <li><a href="{{url_for('auth.login')}}">Sign in</a></li>
+
                   {%endif%}
                 </ul>
+                
+                
             </div>
 
         </div>
