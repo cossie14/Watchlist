@@ -19,6 +19,8 @@ class Config:
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     SUBJECT_PREFIX = 'Watchlist'
     SENDER_EMAIL = 'sylviah@moringaschool.com'
+    
+    
 
     @staticmethod
     def init_app(app):
